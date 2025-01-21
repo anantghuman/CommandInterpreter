@@ -201,7 +201,11 @@ static bool parse_number(Token token, int64_t *result) {
  */
 static bool parse_im(Parser *parser, Operand *op) {
     // STUDENT TODO: Parse current token as an immediate
-    return false;
+    if (parser->current.type != TOK_NUM) {
+        parser->had_error = true;
+        return false;
+    }
+    return parse_number(parser->current, &(op->num_val));
 }
 
 /**
@@ -216,7 +220,11 @@ static bool parse_im(Parser *parser, Operand *op) {
  */
 static bool parse_variable_operand(Parser *parser, Operand *op) {
     // STUDENT TODO: Parse the current token as a variable
-    return false;
+    if (!is_variable(parser->current) || parser->current.type != TOK_IDENT) {
+        parser->had_error = true;
+        return false;
+    }
+    return parse_variable(parser->current, &(op->num_val));
 }
 
 /**
@@ -235,6 +243,14 @@ static bool parse_variable_operand(Parser *parser, Operand *op) {
  */
 static bool parse_var_or_imm(Parser *parser, Operand *op, bool *is_immediate) {
     // STUDENT TODO: Parse the current token as a variable or an immediate
+    if (parser->current.type == TOK_IDENT) {
+        *is_immediate = false;
+        return parse_variable_operand(parser, op);
+    } else if (parser->current.type == TOK_NUM) {
+        *is_immediate = true;
+        return parse_im(parser, op);
+    }
+    parser->had_error = true;
     return false;
 }
 
