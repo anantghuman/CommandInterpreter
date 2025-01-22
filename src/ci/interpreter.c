@@ -37,15 +37,68 @@ void interpret(Interpreter *intr, Command *commands) {
     while (current && !intr->had_error) {
         switch (current->type) {
             // STUDENT TODO: process the commands and take actions as appropriate
-            case CMD_MOV:
+            case CMD_MOV: {
                 intr->variables[current->destination.num_val] = current->val_a.num_val;
-                current = current->next;
+                break;
+            }
+            case CMD_ADD: {
+                int add = intr->variables[current->val_a.num_val];
+                if (current->is_b_immediate)
+                    add += current->val_b.num_val;
+                else
+                    add += intr->variables[current->val_b.num_val];
+                intr->variables[current->destination.num_val] = add;
+                break;
+            }
+            case CMD_SUB: {
+                int sub = intr->variables[current->val_a.num_val];
+                if (current->is_b_immediate)
+                    sub -= current->val_b.num_val;
+                else
+                    sub -= intr->variables[current->val_b.num_val];
+                intr->variables[current->destination.num_val] = sub;
+                break;
+            }
+            case CMD_CMP: {
+                intr->is_less = false;
+                intr->is_greater = false;
+                intr->is_equal = false;
+                int temp;
+                if (current->is_b_immediate) 
+                    temp = current->val_b.num_val;
+                else
+                    temp = intr->variables[current->val_b.num_val];
+                if (current->val_a.num_val > temp) 
+                    intr->is_greater = true;
+                else if (current->val_a.num_val < temp)
+                    intr->is_less = true;
+                else
+                    intr->is_equal = true;
+                break;
+            }
+            case CMD_CMP_U: {
+                intr->is_less = false;
+                intr->is_greater = false;
+                intr->is_equal = false;
+                uint64_t val_a = (uint64_t) current->val_a.num_val;
+                uint64_t val_b = (uint64_t) current->val_a.num_val;
+                if (val_a > val_b)
+                    intr->is_greater = true;
+                else if (val_a < val_b)
+                    intr->is_less = true;
+                else
+                    intr->is_equal = true;
+                break;
+            }
+            case CMD_PRINT:
+                print_base(intr, current);
+                break;
             default:
                 break;
         }
+        current = current->next;
     }
     // Week 4: free the stack at the end
-    free_command(commands);
 }
 
 void print_interpreter_state(Interpreter *intr) {
@@ -113,5 +166,37 @@ static bool cond_holds(Interpreter *intr, BranchCondition cond) {
  */
 static bool print_base(Interpreter *intr, Command *cmd) {
     // STUDENT TODO: Print the given value respecting the appropriate base
+    int temp;
+    if (cmd->is_a_immediate)
+        temp = cmd->val_a.num_val;
+    else 
+        temp = intr->variables[cmd->val_a.num_val];
+    switch (cmd->val_b.base) {
+        case 'd':
+            printf("%d", temp);
+            break;
+        case 'x':
+            printf("%x", (unsigned int)temp);
+            break;
+        case 'b': {
+            char str[200] = "";
+            int i = 0;
+            while (temp != 0) {
+                if (temp % 2 == 0) {
+                    str[i] = '0';
+                } else {
+                    str[i] = '1';
+                }
+                temp /= 2;
+                i++;
+            }
+            for (int j = i; j >= 0; j--) {
+                printf("%c", str[j]);
+            }
+            break;
+        }
+        default:
+            break;
+    }
     return false;
 }

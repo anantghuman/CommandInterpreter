@@ -137,7 +137,12 @@ static bool is_base(Token token) {
  */
 static bool parse_base(Parser *parser, Operand *op) {
     // STUDENT TODO: Parse the current token as a base
-    return false;
+    if (!is_base(parser->current)) {
+        parser->had_error = true;
+        return false;
+    }
+    op->base = parser->current.lexeme[0];
+    return true;
 }
 
 /**
@@ -206,11 +211,15 @@ static bool parse_im(Parser *parser, Operand *op) {
         parser->had_error = true;
         return false;
     }
-    return parse_number(parser->current, &(op->num_val));
+    if (!parse_number(parser->current, &(op->num_val))) {
+        parser->had_error = true;
+        return false;
+    }
+    return true;
 }
 
 /**
- * @brief Parses the next token as a variable.
+ * @brief Parses the current token as a variable.
  *
  * A variable is anything starting with the prefix x and will be of type
  * TOK_IDENT.
@@ -226,11 +235,11 @@ static bool parse_variable_operand(Parser *parser, Operand *op) {
         return false;
     }
     
-    if (parse_variable(parser->current, &(op->num_val))) {
-        printf("parsed: %ld\n", (op->num_val));
-        return true;
+    if (!parse_variable(parser->current, &(op->num_val))) {
+        parser->had_error = true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 /**
@@ -324,30 +333,106 @@ static Command *parse_cmd(Parser *parser) {
         // No commands to parse; we are done
         return NULL;
     }
+    Command* cmd;
     switch (token.type) {
         // STUDENT TODO: Add cases handling different commands
-        case TOK_NL: {            
-            printf("newLINERRROR");
-            break;
-        }
         case TOK_MOV: {
-            Command* cmd = create_command(CMD_MOV);
-            Operand temp;
+            cmd = create_command(CMD_MOV);
             consume(parser, TOK_MOV);
-            if (!parse_variable_operand(parser, &temp)) {
-                printf("err%ld", temp.num_val);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                parser->had_error = true;
                 return NULL;
             }
-            cmd->destination = temp;
             consume(parser, TOK_IDENT);
-            if (!parse_im(parser, &temp)) {
+            if (!parse_im(parser, &(cmd->val_a))) {
                 return NULL;
             }
             cmd->is_a_immediate = true;
-            cmd->val_a.num_val = temp.num_val;            
             consume(parser, TOK_NUM);
             return cmd;
         }
+        case TOK_ADD: {
+            cmd = create_command(CMD_ADD);
+            consume(parser, TOK_ADD);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                return NULL;
+            }
+            if (cmd->is_b_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            return cmd;
+        }
+        case TOK_SUB: {
+            cmd = create_command(CMD_SUB);
+            consume(parser, TOK_SUB);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                return NULL;
+            }
+            if (cmd->is_b_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            return cmd;
+        }
+        case TOK_CMP:
+            cmd = create_command(CMD_CMP);
+            consume(parser, TOK_CMP);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                return NULL;
+            }
+            if (cmd->is_b_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            return cmd;
+        case TOK_CMP_U:
+            cmd = create_command(CMD_CMP_U);
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a)))
+                return NULL;
+            consume(parser, TOK_IDENT);
+            if (!parse_var_or_imm(parser, &(cmd->val_b), &cmd->is_b_immediate)) {
+                return NULL;
+            }
+            if (cmd->is_b_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            return cmd;            
+        case TOK_PRINT:
+            cmd = create_command(TOK_PRINT);
+            consume(parser, TOK_PRINT);
+            if (!parse_var_or_imm(parser, &(cmd->val_a), &(cmd->is_a_immediate)))
+                return NULL;
+            if (cmd->is_a_immediate)
+                consume(parser, TOK_NUM);
+            else    
+                consume(parser, TOK_IDENT);
+            if (!parse_base(parser, &(cmd->val_b)))
+                return NULL;
+            advance(parser);
+            return cmd;
         default: 
             parser->had_error = true;
             break;
@@ -360,5 +445,12 @@ static Command *parse_cmd(Parser *parser) {
 Command *parse_commands(Parser *parser) {
     // STUDENT TODO: Create a linked list of commands using parse_cmd as described in the handout
     // Change this!
-    return parse_cmd(parser);
+    Command* head = parse_cmd(parser);
+    Command* node = head;
+    while (!is_at_end(parser) && !parser->had_error) {
+         node->next = parse_cmd(parser);
+         node = node->next;
+    }
+    return head;
+
 }
