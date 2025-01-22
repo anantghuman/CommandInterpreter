@@ -421,7 +421,7 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_IDENT);
             return cmd;            
         case TOK_PRINT:
-            cmd = create_command(TOK_PRINT);
+            cmd = create_command(CMD_PRINT);
             consume(parser, TOK_PRINT);
             if (!parse_var_or_imm(parser, &(cmd->val_a), &(cmd->is_a_immediate)))
                 return NULL;
