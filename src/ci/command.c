@@ -1,9 +1,24 @@
 #include "command.h"
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void free_command(Command *command) {
     // STUDENT TODO: Free the command and all its children
+    if (command == NULL) {
+        return;
+    }
+    free(command->destination.str_val);
+    // Free val_a operand if it is a string
+    if (command->is_a_string && command->val_a.str_val) {
+        free(command->val_a.str_val);
+    }
+
+    // Free val_b operand if it is a string
+    if (command->is_b_string && command->val_b.str_val) {
+        free(command->val_b.str_val);
+    }
+    free(command);
 }
 
 void print_command(Command *cmd) {

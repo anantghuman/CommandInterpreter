@@ -37,12 +37,15 @@ void interpret(Interpreter *intr, Command *commands) {
     while (current && !intr->had_error) {
         switch (current->type) {
             // STUDENT TODO: process the commands and take actions as appropriate
+            case CMD_MOV:
+                intr->variables[current->destination.num_val] = current->val_a.num_val;
+                current = current->next;
             default:
                 break;
         }
     }
-
     // Week 4: free the stack at the end
+    free_command(commands);
 }
 
 void print_interpreter_state(Interpreter *intr) {

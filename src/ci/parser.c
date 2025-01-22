@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "parser.h"
+#include <stdio.h>
 
 #include "command_type.h"
 #include "token_type.h"
@@ -224,7 +225,12 @@ static bool parse_variable_operand(Parser *parser, Operand *op) {
         parser->had_error = true;
         return false;
     }
-    return parse_variable(parser->current, &(op->num_val));
+    
+    if (parse_variable(parser->current, &(op->num_val))) {
+        printf("parsed: %ld\n", (op->num_val));
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -302,7 +308,7 @@ static bool consume_newline(Parser *parser) {
 static Command *parse_cmd(Parser *parser) {
     // STUDENT TODO: Parse an individual command by looking at the current token's type
     // TODO: Skip newlines before anything else
-
+    skip_nls(parser);
     // You will need to modify this later
     // However, this is fine for getting going
     Token token = parser->current;
@@ -318,10 +324,31 @@ static Command *parse_cmd(Parser *parser) {
         // No commands to parse; we are done
         return NULL;
     }
-
     switch (token.type) {
         // STUDENT TODO: Add cases handling different commands
-        default:
+        case TOK_NL: {            
+            printf("newLINERRROR");
+            break;
+        }
+        case TOK_MOV: {
+            Command* cmd = create_command(CMD_MOV);
+            Operand temp;
+            consume(parser, TOK_MOV);
+            if (!parse_variable_operand(parser, &temp)) {
+                printf("err%ld", temp.num_val);
+                return NULL;
+            }
+            cmd->destination = temp;
+            consume(parser, TOK_IDENT);
+            if (!parse_im(parser, &temp)) {
+                return NULL;
+            }
+            cmd->is_a_immediate = true;
+            cmd->val_a.num_val = temp.num_val;            
+            consume(parser, TOK_NUM);
+            return cmd;
+        }
+        default: 
             parser->had_error = true;
             break;
     }
