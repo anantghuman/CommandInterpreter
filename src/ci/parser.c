@@ -431,11 +431,7 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
-            if (parser->current.type != TOK_NL) {
-                parser->had_error = true;
-                return NULL;
-            }
-            return cmd;          
+            return cmd;            
         case TOK_PRINT:
             cmd = create_command(CMD_PRINT);
             consume(parser, TOK_PRINT);
