@@ -170,21 +170,27 @@ static bool cond_holds(Interpreter *intr, BranchCondition cond) {
  */
 static bool print_base(Interpreter *intr, Command *cmd) {
     // STUDENT TODO: Print the given value respecting the appropriate base
-    int temp;
+    int64_t temp;
     if (cmd->is_a_immediate)
         temp = cmd->val_a.num_val;
     else 
         temp = intr->variables[cmd->val_a.num_val];
     switch (cmd->val_b.base) {
         case 'd':
-            printf("%d", temp);
-            break;
+            printf("%ld\n", temp);
+            return true;
         case 'x':
-            printf("%x", (unsigned int)temp);
-            break;
+            printf("0x");
+            printf("%lx\n", (uint64_t)temp);
+            return true;
         case 'b': {
+            printf("0b");
             char str[200] = "";
             int i = 0;
+            if (temp == 0) {
+                str[i] = '0';
+                i++;
+            }
             while (temp != 0) {
                 if (temp % 2 == 0) {
                     str[i] = '0';
@@ -194,13 +200,15 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                 temp /= 2;
                 i++;
             }
-            for (int j = i; j >= 0; j--) {
+            for (int j = i - 1; j >= 0; j--) {
                 printf("%c", str[j]);
             }
-            break;
+            printf("\n");
+            return true;
         }
         default:
             break;
     }
+    printf("\n");
     return false;
 }

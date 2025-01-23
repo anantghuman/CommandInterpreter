@@ -417,7 +417,11 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
-            return cmd;
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            parser->had_error = true;
+            return NULL;
         case TOK_CMP_U:
             cmd = create_command(CMD_CMP_U);
             consume(parser, TOK_CMP_U);
@@ -431,7 +435,11 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
-            return cmd;            
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            parser->had_error = true;
+            return NULL;           
         case TOK_PRINT:
             cmd = create_command(CMD_PRINT);
             consume(parser, TOK_PRINT);
