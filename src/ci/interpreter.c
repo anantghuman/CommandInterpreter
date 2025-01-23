@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-
+#include <math.h>
 #include "command_type.h"
 #include "mem.h"
 
@@ -187,10 +187,15 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             printf("0b");
             char str[200] = "";
             int i = 0;
+            bool neg = false;
             if (temp == 0) {
                 str[i] = '0';
                 i++;
+            } else if (temp < 0) {
+                temp = -1 * temp;
+                neg = true;
             }
+            
             while (temp != 0) {
                 if (temp % 2 == 0) {
                     str[i] = '0';
@@ -199,6 +204,23 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                 }
                 temp /= 2;
                 i++;
+            }
+            if (neg) {
+                for (int j = i - 1; j >= 0; j--) {
+                    if (str[j] == '1') {
+                        str[j] = '0';
+                    } else {
+                        str[j] = '1';
+                    }
+                }
+                for (int j = i - 1; j >= 0; j--) {
+                    if (str[j] == '1') {
+                        str[j] = '0';
+                    } else {
+                        str[j] = '1';
+                        break;
+                    }
+                }
             }
             for (int j = i - 1; j >= 0; j--) {
                 printf("%c", str[j]);
