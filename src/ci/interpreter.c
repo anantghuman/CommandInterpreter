@@ -213,7 +213,8 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                         str[j] = '1';
                     }
                 }
-                for (int j = i - 1; j >= 0; j--) {
+                int j = i -1;
+                for (; j >= 0; j--) {
                     if (str[j] == '1') {
                         str[j] = '0';
                     } else {
@@ -221,10 +222,15 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                         break;
                     }
                 }
+                if (j == 0)
+                    printf("1");
+                for (j = 0; j < i; j++) 
+                    printf("%c", str[j]);
+            } else {
+                for (int j = i - 1; j >= 0; j--)
+                    printf("%c", str[j]);
             }
-            for (int j = i - 1; j >= 0; j--) {
-                printf("%c", str[j]);
-            }
+            
             printf("\n");
             return true;
         }
