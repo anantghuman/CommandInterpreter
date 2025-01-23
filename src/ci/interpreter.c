@@ -215,7 +215,7 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                 }
                 int j = 0;
                 str[i] = '1';
-                for (; j < i; j++) {
+                for (; j < i + 1; j++) {
                     if (str[j] == '1') {
                         str[j] = '0';
                     } else {
