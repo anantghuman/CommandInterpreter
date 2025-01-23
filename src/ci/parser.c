@@ -341,7 +341,7 @@ static Command *parse_cmd(Parser *parser) {
             consume(parser, TOK_MOV);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
                 parser->had_error = true;
-                return NULL;
+                return NULL; 
             }
             consume(parser, TOK_IDENT);
             if (!parse_im(parser, &(cmd->val_a))) {
@@ -349,11 +349,11 @@ static Command *parse_cmd(Parser *parser) {
             }
             cmd->is_a_immediate = true;
             consume(parser, TOK_NUM);
-            if (parser->current.type != TOK_NL) {
-                parser->had_error = true;
-                return NULL;
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
             }
-            return cmd;
+            parser->had_error = true;
+            return NULL;
         }
         case TOK_ADD: {
             cmd = create_command(CMD_ADD);
@@ -373,11 +373,11 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
-            if (parser->current.type != TOK_NL) {
-                parser->had_error = true;
-                return NULL;
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
             }
-            return cmd;
+            parser->had_error = true;
+            return NULL;
         }
         case TOK_SUB: {
             cmd = create_command(CMD_SUB);
@@ -444,11 +444,11 @@ static Command *parse_cmd(Parser *parser) {
             if (!parse_base(parser, &(cmd->val_b)))
                 return NULL;
             advance(parser);
-            if (parser->current.type != TOK_NL) {
-                parser->had_error = true;
-                return NULL;
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
             }
-            return cmd;
+            parser->had_error = true;
+            return NULL;
         default: 
             parser->had_error = true;
             break;
