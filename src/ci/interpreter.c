@@ -222,10 +222,10 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                         str[j] = '1';
                         break;
                     }
-                    if (j == i)
-                        printf("1");
                 }
-                printf("%c", str[i]);
+                double_t t = log2(i);
+                if (t == floor(t))
+                    printf("%c", str[i]);
             }
             for (int j = i - 1; j >= 0; j--)
                 printf("%c", str[j]);
