@@ -349,6 +349,10 @@ static Command *parse_cmd(Parser *parser) {
             }
             cmd->is_a_immediate = true;
             consume(parser, TOK_NUM);
+            if (parser->current.type != TOK_NL) {
+                parser->had_error = true;
+                return NULL;
+            }
             return cmd;
         }
         case TOK_ADD: {
@@ -365,10 +369,14 @@ static Command *parse_cmd(Parser *parser) {
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
                 return NULL;
             }
-            if (cmd->is_b_immediate) 
+            if (cmd->is_b_immediate)
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
+            if (parser->current.type != TOK_NL) {
+                parser->had_error = true;
+                return NULL;
+            }
             return cmd;
         }
         case TOK_SUB: {
@@ -389,6 +397,10 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
+            if (parser->current.type != TOK_NL) {
+                parser->had_error = true;
+                return NULL;
+            }
             return cmd;
         }
         case TOK_CMP:
@@ -405,6 +417,10 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
+            if (parser->current.type != TOK_NL) {
+                parser->had_error = true;
+                return NULL;
+            }
             return cmd;
         case TOK_CMP_U:
             cmd = create_command(CMD_CMP_U);
@@ -419,7 +435,11 @@ static Command *parse_cmd(Parser *parser) {
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
-            return cmd;            
+            if (parser->current.type != TOK_NL) {
+                parser->had_error = true;
+                return NULL;
+            }
+            return cmd;          
         case TOK_PRINT:
             cmd = create_command(CMD_PRINT);
             consume(parser, TOK_PRINT);
@@ -432,6 +452,10 @@ static Command *parse_cmd(Parser *parser) {
             if (!parse_base(parser, &(cmd->val_b)))
                 return NULL;
             advance(parser);
+            if (parser->current.type != TOK_NL) {
+                parser->had_error = true;
+                return NULL;
+            }
             return cmd;
         default: 
             parser->had_error = true;
