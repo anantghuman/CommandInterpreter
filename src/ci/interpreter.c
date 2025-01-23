@@ -185,7 +185,7 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             return true;
         case 'b': {
             printf("0b");
-            char str[200] = "";
+            char str[500] = "";
             int i = 0;
             bool neg = false;
             if (temp == 0) {
@@ -213,23 +213,20 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                         str[j] = '1';
                     }
                 }
-                int j = i -1;
-                for (; j >= 0; j--) {
+                int j = 0;
+                for (; j < i; j++) {
                     if (str[j] == '1') {
                         str[j] = '0';
                     } else {
                         str[j] = '1';
                         break;
                     }
+                    if (j == i - 1)
+                        printf("1");
                 }
-                if (j == 0)
-                    printf("1");
-                for (j = 0; j < i; j++) 
-                    printf("%c", str[j]);
-            } else {
-                for (int j = i - 1; j >= 0; j--)
-                    printf("%c", str[j]);
             }
+            for (int j = i - 1; j >= 0; j--)
+                printf("%c", str[j]);
             
             printf("\n");
             return true;
