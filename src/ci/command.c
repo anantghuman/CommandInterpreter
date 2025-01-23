@@ -16,6 +16,7 @@ void free_command(Command *command) {
     if (command->is_b_string && command->val_b.str_val) {
         free(command->val_b.str_val);
     }
+    free_command(command->next);
     free(command);
 }
 
