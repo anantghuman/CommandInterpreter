@@ -63,14 +63,14 @@ void interpret(Interpreter *intr, Command *commands) {
                 intr->is_less = false;
                 intr->is_greater = false;
                 intr->is_equal = false;
-                int temp;
+                int64_t temp;
                 if (current->is_b_immediate) 
                     temp = current->val_b.num_val;
                 else
                     temp = intr->variables[current->val_b.num_val];
-                if (current->val_a.num_val > temp) 
+                if (intr->variables[current->val_a.num_val] > temp) 
                     intr->is_greater = true;
-                else if (current->val_a.num_val < temp)
+                else if (intr->variables[current->val_a.num_val] < temp)
                     intr->is_less = true;
                 else
                     intr->is_equal = true;
@@ -80,8 +80,12 @@ void interpret(Interpreter *intr, Command *commands) {
                 intr->is_less = false;
                 intr->is_greater = false;
                 intr->is_equal = false;
-                uint64_t val_a = (uint64_t) current->val_a.num_val;
-                uint64_t val_b = (uint64_t) current->val_a.num_val;
+                uint64_t val_a = (uint64_t) intr->variables[current->val_a.num_val];
+                uint64_t val_b;
+                if (current->is_b_immediate) 
+                    val_b = current->val_b.num_val;
+                else
+                    val_b = intr->variables[current->val_b.num_val];
                 if (val_a > val_b)
                     intr->is_greater = true;
                 else if (val_a < val_b)

@@ -408,7 +408,7 @@ static Command *parse_cmd(Parser *parser) {
             return cmd;
         case TOK_CMP_U:
             cmd = create_command(CMD_CMP_U);
-            consume(parser, TOK_IDENT);
+            consume(parser, TOK_CMP_U);
             if (!parse_variable_operand(parser, &(cmd->val_a)))
                 return NULL;
             consume(parser, TOK_IDENT);
