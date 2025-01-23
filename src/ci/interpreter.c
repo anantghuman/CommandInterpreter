@@ -42,7 +42,7 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_ADD: {
-                int add = intr->variables[current->val_a.num_val];
+                int64_t add = intr->variables[current->val_a.num_val];
                 if (current->is_b_immediate)
                     add += current->val_b.num_val;
                 else
@@ -51,7 +51,7 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_SUB: {
-                int sub = intr->variables[current->val_a.num_val];
+                int64_t sub = intr->variables[current->val_a.num_val];
                 if (current->is_b_immediate)
                     sub -= current->val_b.num_val;
                 else
