@@ -214,6 +214,7 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                     }
                 }
                 int j = 0;
+                str[i] = '1';
                 for (; j < i; j++) {
                     if (str[j] == '1') {
                         str[j] = '0';
@@ -221,9 +222,10 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                         str[j] = '1';
                         break;
                     }
-                    if (j == i - 1)
+                    if (j == i)
                         printf("1");
                 }
+                printf("%c", str[i]);
             }
             for (int j = i - 1; j >= 0; j--)
                 printf("%c", str[j]);
