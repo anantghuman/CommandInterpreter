@@ -352,6 +352,7 @@ static Command *parse_cmd(Parser *parser) {
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
+            free_command(cmd);
             parser->had_error = true;
             return NULL;
         }
@@ -376,6 +377,7 @@ static Command *parse_cmd(Parser *parser) {
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
+            free_command(cmd);
             parser->had_error = true;
             return NULL;
         }
@@ -398,6 +400,7 @@ static Command *parse_cmd(Parser *parser) {
             else
                 consume(parser, TOK_IDENT);
             if (parser->current.type != TOK_NL) {
+                free_command(cmd);
                 parser->had_error = true;
                 return NULL;
             }
@@ -420,6 +423,7 @@ static Command *parse_cmd(Parser *parser) {
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
+            free_command(cmd);
             parser->had_error = true;
             return NULL;
         case TOK_CMP_U:
@@ -438,6 +442,7 @@ static Command *parse_cmd(Parser *parser) {
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
+            free_command(cmd);
             parser->had_error = true;
             return NULL;           
         case TOK_PRINT:
@@ -455,9 +460,11 @@ static Command *parse_cmd(Parser *parser) {
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
+            free_command(cmd);
             parser->had_error = true;
             return NULL;
         default: 
+            free_command(cmd);
             parser->had_error = true;
             break;
     }
