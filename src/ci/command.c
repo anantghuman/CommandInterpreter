@@ -5,6 +5,11 @@
 
 void free_command(Command *command) {
     // STUDENT TODO: Free the command and all its children
+    if (command == NULL)
+        return;
+    Command* n = command->next;
+    free(command);
+    free_command(n);
 }
 
 void print_command(Command *cmd) {
