@@ -190,12 +190,29 @@ static bool print_base(Interpreter *intr, Command *cmd) {
                 return true;
             }
             bool lead = false;
-            for (int i = 63; i >= 0; i--) {
-                int bit = (temp >> i) & 1;
-                if (bit == 1)
-                    lead = true;
-                if (lead)
-                    printf("%d", bit);
+            if (temp < 0) {
+                for (int i = 63; i >= 0; i--) {
+                    int bit = (temp >> i) & 1;
+                    if (bit == 1)
+                        lead = true;
+                    if (lead)
+                        printf("%d", bit);
+                }
+            }
+            else {
+                char str[500] = "";
+                int i = 0;
+                while (temp != 0) {
+                    if (temp % 2 == 0) {
+                        str[i] = '0';
+                    } else {
+                        str[i] = '1';
+                    }
+                    temp /= 2;
+                    i++;
+                }
+                for (int j = i - 1; j >= 0; j--)
+                    printf("%c", str[j]);
             }
             printf("\n");
             return true;
