@@ -185,10 +185,6 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             return true;
         case 'b': {
             printf("0b");
-            if (temp == 0) {
-                printf("0");
-                return true;
-            }
             bool lead = false;
             if (temp < 0) {
                 for (int i = 63; i >= 0; i--) {
@@ -202,6 +198,10 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             else {
                 char str[500] = "";
                 int i = 0;
+                if (temp == i) {
+                    str[i] = '0';
+                    i++;
+                }
                 while (temp != 0) {
                     if (temp % 2 == 0) {
                         str[i] = '0';
