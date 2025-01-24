@@ -185,51 +185,14 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             return true;
         case 'b': {
             printf("0b");
-            char str[500] = "";
-            int i = 0;
-            bool neg = false;
-            if (temp == 0) {
-                str[i] = '0';
-                i++;
-            } else if (temp < 0) {
-                temp = -1 * temp;
-                neg = true;
+            bool lead = false;
+            for (int i = 63; i >= 0; i--) {
+                int bit = (temp >> i) & 1;
+                if (bit == 1)
+                    lead = true;
+                if (lead)
+                    printf("%d", bit);
             }
-            
-            while (temp != 0) {
-                if (temp % 2 == 0) {
-                    str[i] = '0';
-                } else {
-                    str[i] = '1';
-                }
-                temp /= 2;
-                i++;
-            }
-            if (neg) {
-                for (int j = i - 1; j >= 0; j--) {
-                    if (str[j] == '1') {
-                        str[j] = '0';
-                    } else {
-                        str[j] = '1';
-                    }
-                }
-                int j = 0;
-                str[i] = '1';
-                for (; j < i + 1; j++) {
-                    if (str[j] == '1') {
-                        str[j] = '0';
-                    } else {
-                        str[j] = '1';
-                        break;
-                    }
-                }
-                double_t t = log2(i);
-                if (t == floor(t))
-                    printf("%c", str[i]);
-            }
-            for (int j = i - 1; j >= 0; j--)
-                printf("%c", str[j]);
-            
             printf("\n");
             return true;
         }

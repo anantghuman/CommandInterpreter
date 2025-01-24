@@ -8,16 +8,9 @@ void free_command(Command *command) {
     if (command == NULL) {
         return;
     }
-    free(command->destination.str_val);
-    if (command->is_a_string && command->val_a.str_val) {
-        free(command->val_a.str_val);
-    }
-
-    if (command->is_b_string && command->val_b.str_val) {
-        free(command->val_b.str_val);
-    }
-    free_command(command->next);
-    free(command);
+    Command *next = command->next;  // Save the next command in the list.
+    free(command);          // Free the current command.
+    free_command(next);
 }
 
 void print_command(Command *cmd) {
