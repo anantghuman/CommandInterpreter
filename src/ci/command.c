@@ -8,8 +8,8 @@ void free_command(Command *command) {
     if (command == NULL) {
         return;
     }
-    Command *next = command->next;  // Save the next command in the list.
-    free(command);          // Free the current command.
+    Command *next = command->next; 
+    free(command);
     free_command(next);
 }
 
