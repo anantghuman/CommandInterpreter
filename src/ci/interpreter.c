@@ -185,6 +185,10 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             return true;
         case 'b': {
             printf("0b");
+            if (temp == 0) {
+                printf("0");
+                return true;
+            }
             bool lead = false;
             for (int i = 63; i >= 0; i--) {
                 int bit = (temp >> i) & 1;
