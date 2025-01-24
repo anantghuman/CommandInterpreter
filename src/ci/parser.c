@@ -464,7 +464,6 @@ static Command *parse_cmd(Parser *parser) {
             parser->had_error = true;
             return NULL;
         default: 
-            free_command(cmd);
             parser->had_error = true;
             break;
     }
