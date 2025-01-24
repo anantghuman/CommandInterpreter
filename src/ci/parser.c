@@ -340,11 +340,12 @@ static Command *parse_cmd(Parser *parser) {
             cmd = create_command(CMD_MOV);
             consume(parser, TOK_MOV);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
-                parser->had_error = true;
+                free_command(cmd);
                 return NULL; 
             }
             consume(parser, TOK_IDENT);
             if (!parse_im(parser, &(cmd->val_a))) {
+                free_command(cmd);
                 return NULL;
             }
             cmd->is_a_immediate = true;
@@ -360,14 +361,17 @@ static Command *parse_cmd(Parser *parser) {
             cmd = create_command(CMD_ADD);
             consume(parser, TOK_ADD);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free_command(cmd);
                 return NULL;
             }
             consume(parser, TOK_IDENT);
             if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free_command(cmd);
                 return NULL;
             }
             consume(parser, TOK_IDENT);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free_command(cmd);
                 return NULL;
             }
             if (cmd->is_b_immediate)
@@ -385,14 +389,17 @@ static Command *parse_cmd(Parser *parser) {
             cmd = create_command(CMD_SUB);
             consume(parser, TOK_SUB);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free_command(cmd);
                 return NULL;
             }
             consume(parser, TOK_IDENT);
             if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free_command(cmd);
                 return NULL;
             }
             consume(parser, TOK_IDENT);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free_command(cmd);
                 return NULL;
             }
             if (cmd->is_b_immediate) 
@@ -410,10 +417,12 @@ static Command *parse_cmd(Parser *parser) {
             cmd = create_command(CMD_CMP);
             consume(parser, TOK_CMP);
             if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free_command(cmd);
                 return NULL;
             }
             consume(parser, TOK_IDENT);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free_command(cmd);
                 return NULL;
             }
             if (cmd->is_b_immediate) 
@@ -429,10 +438,13 @@ static Command *parse_cmd(Parser *parser) {
         case TOK_CMP_U:
             cmd = create_command(CMD_CMP_U);
             consume(parser, TOK_CMP_U);
-            if (!parse_variable_operand(parser, &(cmd->val_a)))
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free_command(cmd);
                 return NULL;
+            }
             consume(parser, TOK_IDENT);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &cmd->is_b_immediate)) {
+                free_command(cmd);
                 return NULL;
             }
             if (cmd->is_b_immediate) 
@@ -481,6 +493,6 @@ Command *parse_commands(Parser *parser) {
          node->next = parse_cmd(parser);
          node = node->next;
     }
+    free(parser);
     return head;
-
 }
