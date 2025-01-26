@@ -97,6 +97,32 @@ void interpret(Interpreter *intr, Command *commands) {
             case CMD_PRINT:
                 print_base(intr, current);
                 break;
+            case CMD_AND:
+                intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] & intr->variables[current->val_b.num_val];
+                break;
+                
+            case CMD_ASR:
+                intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] >> current->val_b.num_val;
+                break;
+            case CMD_EOR:
+                intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] ^ intr->variables[current->val_b.num_val];
+                break;
+
+            // case CMD_LOAD:
+
+            case CMD_LSL:
+                intr->variables[current->destination.num_val] = ((uint64_t)intr->variables[current->val_a.num_val]) << ((uint64_t) current->val_b.num_val);
+                
+
+            case CMD_LSR:
+                intr->variables[current->destination.num_val] = ((uint64_t)intr->variables[current->val_a.num_val]) >> ((uint64_t) current->val_b.num_val);
+
+            case CMD_ORR:
+                intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] | intr->variables[current->val_b.num_val];
+
+            // case CMD_PUT:
+
+            // case CMD_STORE:
             default:
                 break;
         }

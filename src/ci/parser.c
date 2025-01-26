@@ -479,6 +479,156 @@ static Command *parse_cmd(Parser *parser) {
             free(cmd);
             parser->had_error = true;
             return NULL;
+        case TOK_AND:
+            cmd = create_command(CMD_AND);
+            consume(parser, TOK_ADD);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_b))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            parser->had_error = true;
+            return NULL;
+            break;
+        case TOK_ASR:
+            cmd = create_command(CMD_ASR);
+            consume(parser, TOK_ADD);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_im(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_NUM);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            parser->had_error = true;
+            return NULL;
+            break;
+        case TOK_EOR:
+            cmd = create_command(CMD_EOR);
+            consume(parser, TOK_EOR);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_b))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            parser->had_error = true;
+            return NULL;
+            break;
+        case TOK_LSL:
+            cmd = create_command(CMD_LSL);
+            consume(parser, TOK_ADD);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_im(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_NUM);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            parser->had_error = true;
+            return NULL;
+            break;
+        case TOK_LSR:
+            cmd = create_command(CMD_LSR);
+            consume(parser, TOK_ADD);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_im(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_NUM);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            parser->had_error = true;
+            return NULL;
+            break;
+        case CMD_ORR:
+            cmd = create_command(CMD_ORR);
+            consume(parser, TOK_EOR);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_variable_operand(parser, &(cmd->val_b))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            parser->had_error = true;
+            return NULL;
+            break;
         default: 
             parser->had_error = true;
             break;
