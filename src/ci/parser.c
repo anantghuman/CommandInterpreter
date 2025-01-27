@@ -481,7 +481,7 @@ static Command *parse_cmd(Parser *parser) {
             return NULL;
         case TOK_AND:
             cmd = create_command(CMD_AND);
-            consume(parser, TOK_ADD);
+            consume(parser, TOK_AND);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
                 free(cmd);
                 return NULL;
@@ -506,7 +506,7 @@ static Command *parse_cmd(Parser *parser) {
             break;
         case TOK_ASR:
             cmd = create_command(CMD_ASR);
-            consume(parser, TOK_ADD);
+            consume(parser, TOK_ASR);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
                 free(cmd);
                 return NULL;
@@ -556,7 +556,7 @@ static Command *parse_cmd(Parser *parser) {
             break;
         case TOK_LSL:
             cmd = create_command(CMD_LSL);
-            consume(parser, TOK_ADD);
+            consume(parser, TOK_LSL);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
                 free(cmd);
                 return NULL;
@@ -581,7 +581,7 @@ static Command *parse_cmd(Parser *parser) {
             break;
         case TOK_LSR:
             cmd = create_command(CMD_LSR);
-            consume(parser, TOK_ADD);
+            consume(parser, TOK_LSR);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
                 free(cmd);
                 return NULL;
@@ -606,7 +606,7 @@ static Command *parse_cmd(Parser *parser) {
             break;
         case CMD_ORR:
             cmd = create_command(CMD_ORR);
-            consume(parser, TOK_EOR);
+            consume(parser, CMD_ORR);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
                 free(cmd);
                 return NULL;
