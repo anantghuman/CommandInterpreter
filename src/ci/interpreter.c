@@ -112,13 +112,16 @@ void interpret(Interpreter *intr, Command *commands) {
 
             case CMD_LSL:
                 intr->variables[current->destination.num_val] = ((uint64_t)intr->variables[current->val_a.num_val]) << ((uint64_t) current->val_b.num_val);
+                break;
                 
 
             case CMD_LSR:
                 intr->variables[current->destination.num_val] = ((uint64_t)intr->variables[current->val_a.num_val]) >> ((uint64_t) current->val_b.num_val);
+                break;
 
             case CMD_ORR:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] | intr->variables[current->val_b.num_val];
+                break;
 
             // case CMD_PUT:
 

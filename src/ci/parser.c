@@ -517,7 +517,7 @@ static Command *parse_cmd(Parser *parser) {
                 return NULL;
             }
             consume(parser, TOK_IDENT);
-            if (!parse_im(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+            if (!parse_im(parser, &(cmd->val_b))) {
                 free(cmd);
                 return NULL;
             }
@@ -567,7 +567,7 @@ static Command *parse_cmd(Parser *parser) {
                 return NULL;
             }
             consume(parser, TOK_IDENT);
-            if (!parse_im(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+            if (!parse_im(parser, &(cmd->val_b))) {
                 free(cmd);
                 return NULL;
             }
@@ -592,7 +592,7 @@ static Command *parse_cmd(Parser *parser) {
                 return NULL;
             }
             consume(parser, TOK_IDENT);
-            if (!parse_im(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+            if (!parse_im(parser, &(cmd->val_b))) {
                 free(cmd);
                 return NULL;
             }
