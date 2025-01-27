@@ -604,7 +604,7 @@ static Command *parse_cmd(Parser *parser) {
             parser->had_error = true;
             return NULL;
             break;
-        case CMD_ORR:
+        case TOK_ORR:
             cmd = create_command(CMD_ORR);
             consume(parser, TOK_ORR);
             if (!parse_variable_operand(parser, &(cmd->destination))) {
