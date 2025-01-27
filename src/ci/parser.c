@@ -629,6 +629,33 @@ static Command *parse_cmd(Parser *parser) {
             parser->had_error = true;
             return NULL;
             break;
+        case TOK_LOAD:
+            cmd = create_command(CMD_LOAD);
+            consume(parser, TOK_LOAD);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_im(parser, &(cmd->val_a))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_NUM);
+            if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free(cmd);
+                return NULL;
+            }
+            if (cmd->is_b_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            if (parser->current.type != TOK_NL) {
+                free(cmd);
+                parser->had_error = true;
+                return NULL;
+            }
+            return cmd;
         default: 
             parser->had_error = true;
             break;

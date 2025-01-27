@@ -60,9 +60,6 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_CMP: {
-                intr->is_less = false;
-                intr->is_greater = false;
-                intr->is_equal = false;
                 int64_t temp;
                 if (current->is_b_immediate) 
                     temp = current->val_b.num_val;
@@ -77,9 +74,6 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_CMP_U: {
-                intr->is_less = false;
-                intr->is_greater = false;
-                intr->is_equal = false;
                 uint64_t val_a = (uint64_t) intr->variables[current->val_a.num_val];
                 uint64_t val_b;
                 if (current->is_b_immediate) 
@@ -100,28 +94,33 @@ void interpret(Interpreter *intr, Command *commands) {
             case CMD_AND:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] & intr->variables[current->val_b.num_val];
                 break;
-                
             case CMD_ASR:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] >> current->val_b.num_val;
                 break;
             case CMD_EOR:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] ^ intr->variables[current->val_b.num_val];
                 break;
-
-            // case CMD_LOAD:
-
             case CMD_LSL:
                 intr->variables[current->destination.num_val] = ((uint64_t)intr->variables[current->val_a.num_val]) << ((uint64_t) current->val_b.num_val);
                 break;
-                
-
             case CMD_LSR:
                 intr->variables[current->destination.num_val] = ((uint64_t)intr->variables[current->val_a.num_val]) >> ((uint64_t) current->val_b.num_val);
                 break;
-
             case CMD_ORR:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] | intr->variables[current->val_b.num_val];
                 break;
+            case CMD_LOAD: {
+                uintptr_t start;
+                if (current->is_b_immediate)
+                    start = (uintptr_t)current->val_b.num_val;
+                else
+                    start = (uintptr_t)intr->variables[current->val_b.num_val];
+                int64_t num = current->val_a.num_val;
+                if (num != 2 || num != 4 || num != 6 || num != 8) {
+                    return;
+                }
+                memcpy(&(intr->variables[current->destination.num_val]), start, num);
+            }
 
             // case CMD_PUT:
 
@@ -245,6 +244,9 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             }
             printf("\n");
             return true;
+        }
+        case 's': {
+            
         }
         default:
             break;
