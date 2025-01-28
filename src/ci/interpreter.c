@@ -7,6 +7,7 @@
 #include <string.h>
 #include "command_type.h"
 #include "mem.h"
+#include <stdlib.h>
 
 static bool    cond_holds(Interpreter *intr, BranchCondition cond);
 static int64_t fetch_number_value(Interpreter *intr, Operand *op, bool is_im);
@@ -126,13 +127,29 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_PUT: {
-                int64_t start;
-                if (current->is_b_immediate)
-                    start = current->val_a.num_val;
-                else
-                    start = intr->variables[current->val_b.num_val];
-                strcpy((char*)start, current->val_a.str_val);
+                char* str = current->val_a.str_val; 
+                size_t length = strlen(str) + 1;   
+                size_t start;
+
+                if (current->is_b_immediate) {
+                    start = current->val_b.num_val; 
+                } else {
+                    start = intr->variables[current->val_b.num_val]; 
+                }
+
+                for (size_t i = 0; i < length; i++) {
+                    if (!mem_store((uint8_t*)&str[i], start + i, 1)) {
+                        intr->had_error = true;
+                        return;
+                    }
+                }
+
+                if (current->val_a.str_val) {
+                    free(current->val_a.str_val);
+                }
+
                 break;
+                
             }
             case CMD_LOAD: {
                 size_t start;
@@ -149,9 +166,9 @@ void interpret(Interpreter *intr, Command *commands) {
                 uint8_t temp = 0;
                 mem_load(&temp, start, num);
                 intr->variables[temp] = (uint64_t)temp;
+
                 break;
             }
-            
             default:
                 break;
         }
@@ -273,7 +290,20 @@ static bool print_base(Interpreter *intr, Command *cmd) {
             return true;
         }
         case 's': {
-            
+            uint8_t ch;
+            while (true) {
+                if (!mem_load(&ch, temp, 1)) {
+                    intr->had_error = true;
+                    return false;
+                }
+                if (ch == '\0') {
+                    break;
+                } else
+                    putchar(ch);
+                temp++;
+            }
+            printf("\n");
+            return true;
         }
         default:
             break;

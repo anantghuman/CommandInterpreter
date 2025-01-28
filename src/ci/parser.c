@@ -686,14 +686,14 @@ static Command *parse_cmd(Parser *parser) {
         case TOK_PUT:
             cmd = create_command(CMD_PUT);
             consume(parser, TOK_PUT);
-            cmd->val_a.str_val = malloc(strlen(parser->current.lexeme) + 1);
-            strcpy(cmd->val_a.str_val, parser->current.lexeme);
+            cmd->val_a.str_val = malloc(parser->current.length);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
             consume(parser, TOK_STR);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
                 free(cmd);
                 return NULL;
             }
-            if (cmd->is_a_immediate) 
+            if (cmd->is_b_immediate) 
                 consume(parser, TOK_NUM);
             else
                 consume(parser, TOK_IDENT);
