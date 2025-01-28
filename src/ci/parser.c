@@ -703,7 +703,6 @@ static Command *parse_cmd(Parser *parser) {
                 return NULL;
             }
             return cmd;
-
         default: 
             parser->had_error = true;
             break;

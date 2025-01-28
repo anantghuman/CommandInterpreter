@@ -111,16 +111,18 @@ void interpret(Interpreter *intr, Command *commands) {
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] | intr->variables[current->val_b.num_val];
                 break;
             case CMD_STORE:  {
-                int64_t store;
-                if (current->is_a_immediate)
-                    store = current->val_b.num_val;
-                else
-                    store = intr->variables[current->val_a.num_val];
-                int64_t num = current->val_b.num_val;
-                if (num != 1 && num != 2 && num != 4 && num != 8) {
-                    return;
+                if (current->is_a_immediate) {
+                    if (!mem_store((uint8_t*)&intr->variables[current->destination.num_val], current->val_a.num_val, current->val_b.num_val)) {
+                        intr->had_error = true;
+                        return;
+                    }
                 }
-                memcpy((void*)store, &(intr->variables[current->destination.num_val]), num);
+                else {
+                    if (!mem_store((uint8_t*)&intr->variables[current->destination.num_val], intr->variables[current->val_a.num_val], current->val_b.num_val)) {
+                        intr->had_error = true;
+                        return;
+                    }
+                }
                 break;
             }
             case CMD_PUT: {
@@ -133,17 +135,20 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_LOAD: {
-                int64_t start;
+                size_t start;
                 if (current->is_b_immediate)
-                    start = current->val_b.num_val;
+                    start = (size_t)current->val_b.num_val;
                 else
-                    start = intr->variables[current->val_b.num_val];
-                int64_t num = current->val_a.num_val;
+                    start = (size_t)intr->variables[current->val_b.num_val];
+                size_t num = (size_t)current->val_a.num_val;
                 if (num != 1 && num != 2 && num != 4 && num != 8) {
+                    intr->had_error = true;
                     return;
                 }
                 intr->variables[current->destination.num_val] = 0;
-                memcpy(&(intr->variables[current->destination.num_val]), (void*)start, num);
+                uint8_t temp = 0;
+                mem_load(&temp, start, num);
+                intr->variables[temp] = (uint64_t)temp;
                 break;
             }
             
