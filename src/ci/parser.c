@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "parser.h"
 #include <stdio.h>
-
+#include <string.h>
 #include "command_type.h"
 #include "token_type.h"
 
@@ -686,7 +686,8 @@ static Command *parse_cmd(Parser *parser) {
         case TOK_PUT:
             cmd = create_command(CMD_PUT);
             consume(parser, TOK_PUT);
-            cmd->val_a.str_val = parser->current.lexeme;
+            cmd->val_a.str_val = malloc(strlen(parser->current.lexeme) + 1);
+            strcpy(cmd->val_a.str_val, parser->current.lexeme);
             consume(parser, TOK_STR);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
                 free(cmd);

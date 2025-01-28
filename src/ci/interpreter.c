@@ -110,7 +110,7 @@ void interpret(Interpreter *intr, Command *commands) {
             case CMD_ORR:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] | intr->variables[current->val_b.num_val];
                 break;
-            case CMD_STORE: 
+            case CMD_STORE:  {
                 int64_t store;
                 if (current->is_a_immediate)
                     store = current->val_b.num_val;
@@ -122,6 +122,7 @@ void interpret(Interpreter *intr, Command *commands) {
                 }
                 memcpy((void*)store, &(intr->variables[current->destination.num_val]), num);
                 break;
+            }
             case CMD_PUT: {
                 int64_t start;
                 if (current->is_b_immediate)
