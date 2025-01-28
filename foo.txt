@@ -1,0 +1,23 @@
+Parser encountered an error:
+At Token: store
+Token type: 28
+Token length: 5
+Line: 2:1
+
+Parsed commands up to this point:
+Command type: 12
+Destination: 0
+Operands:
+A:
+Is immediate: 1
+Is a string: 0
+Value: 81985529216486895
+
+B:
+Is immediate: 0
+Is a string: 0
+Value: 0
+
+Branch condition: -1
+
+

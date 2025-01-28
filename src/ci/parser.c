@@ -656,6 +656,53 @@ static Command *parse_cmd(Parser *parser) {
                 return NULL;
             }
             return cmd;
+        case TOK_STORE:
+            cmd = create_command(CMD_STORE);
+            consume(parser, TOK_STORE);
+            if (!parse_variable_operand(parser, &(cmd->destination))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_IDENT);
+            if (!parse_var_or_imm(parser, &(cmd->val_a), &(cmd->is_a_immediate))) {
+                free(cmd);
+                return NULL;
+            }
+            if (cmd->is_a_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            if (!parse_im(parser, &(cmd->val_b))) {
+                free(cmd);
+                return NULL;
+            }
+            consume(parser, TOK_NUM);
+            if (parser->current.type != TOK_NL) {
+                free(cmd);
+                parser->had_error = true;
+                return NULL;
+            }
+            return cmd;
+        case TOK_PUT:
+            cmd = create_command(CMD_PUT);
+            consume(parser, TOK_PUT);
+            cmd->val_a.str_val = parser->current.lexeme;
+            consume(parser, TOK_STR);
+            if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free(cmd);
+                return NULL;
+            }
+            if (cmd->is_a_immediate) 
+                consume(parser, TOK_NUM);
+            else
+                consume(parser, TOK_IDENT);
+            if (parser->current.type != TOK_NL) {
+                free(cmd);
+                parser->had_error = true;
+                return NULL;
+            }
+            return cmd;
+
         default: 
             parser->had_error = true;
             break;

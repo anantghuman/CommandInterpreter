@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "command_type.h"
 #include "mem.h"
 
@@ -109,22 +110,42 @@ void interpret(Interpreter *intr, Command *commands) {
             case CMD_ORR:
                 intr->variables[current->destination.num_val] = intr->variables[current->val_a.num_val] | intr->variables[current->val_b.num_val];
                 break;
-            case CMD_LOAD: {
-                uintptr_t start;
-                if (current->is_b_immediate)
-                    start = (uintptr_t)current->val_b.num_val;
+            case CMD_STORE: 
+                int64_t store;
+                if (current->is_a_immediate)
+                    store = current->val_b.num_val;
                 else
-                    start = (uintptr_t)intr->variables[current->val_b.num_val];
-                int64_t num = current->val_a.num_val;
-                if (num != 2 || num != 4 || num != 6 || num != 8) {
+                    store = intr->variables[current->val_a.num_val];
+                int64_t num = current->val_b.num_val;
+                if (num != 1 && num != 2 && num != 4 && num != 8) {
                     return;
                 }
-                memcpy(&(intr->variables[current->destination.num_val]), start, num);
+                memcpy((void*)store, &(intr->variables[current->destination.num_val]), num);
+                break;
+            case CMD_PUT: {
+                int64_t start;
+                if (current->is_b_immediate)
+                    start = current->val_a.num_val;
+                else
+                    start = intr->variables[current->val_b.num_val];
+                strcpy((char*)start, current->val_a.str_val);
+                break;
             }
-
-            // case CMD_PUT:
-
-            // case CMD_STORE:
+            case CMD_LOAD: {
+                int64_t start;
+                if (current->is_b_immediate)
+                    start = current->val_b.num_val;
+                else
+                    start = intr->variables[current->val_b.num_val];
+                int64_t num = current->val_a.num_val;
+                if (num != 1 && num != 2 && num != 4 && num != 8) {
+                    return;
+                }
+                intr->variables[current->destination.num_val] = 0;
+                memcpy(&(intr->variables[current->destination.num_val]), (void*)start, num);
+                break;
+            }
+            
             default:
                 break;
         }
