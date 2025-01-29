@@ -158,15 +158,14 @@ void interpret(Interpreter *intr, Command *commands) {
                 else
                     start = (size_t)intr->variables[current->val_b.num_val];
                 size_t num = (size_t)current->val_a.num_val;
-                if (num != 1 && num != 2 && num != 4 && num != 8) {
+                if (!(num == 1 || num == 2 || num == 4 || num == 8)) {
                     intr->had_error = true;
                     return;
                 }
                 intr->variables[current->destination.num_val] = 0;
                 uint8_t temp = 0;
                 mem_load(&temp, start, num);
-                intr->variables[temp] = (uint64_t)temp;
-
+                intr->variables[current->destination.num_val] = (uint64_t)temp;
                 break;
             }
             default:
