@@ -139,6 +139,7 @@ void interpret(Interpreter *intr, Command *commands) {
 
                 for (size_t i = 0; i < length; i++) {
                     if (!mem_store((uint8_t*)&str[i], start + i, 1)) {
+                        free(current->val_a.str_val);
                         intr->had_error = true;
                         return;
                     }

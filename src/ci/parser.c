@@ -628,7 +628,6 @@ static Command *parse_cmd(Parser *parser) {
             free(cmd);
             parser->had_error = true;
             return NULL;
-            break;
         case TOK_LOAD:
             cmd = create_command(CMD_LOAD);
             consume(parser, TOK_LOAD);
@@ -691,6 +690,7 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_STR);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
+                free(cmd->val_a.str_val);
                 free(cmd);
                 return NULL;
             }
@@ -699,6 +699,7 @@ static Command *parse_cmd(Parser *parser) {
             else
                 consume(parser, TOK_IDENT);
             if (parser->current.type != TOK_NL) {
+                free(cmd->val_a.str_val);
                 free(cmd);
                 parser->had_error = true;
                 return NULL;
