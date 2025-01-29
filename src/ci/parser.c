@@ -688,6 +688,7 @@ static Command *parse_cmd(Parser *parser) {
             consume(parser, TOK_PUT);
             cmd->val_a.str_val = malloc(parser->current.length + 1);
             strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_STR);
             if (!parse_var_or_imm(parser, &(cmd->val_b), &(cmd->is_b_immediate))) {
                 free(cmd);
