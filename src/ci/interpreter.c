@@ -144,10 +144,7 @@ void interpret(Interpreter *intr, Command *commands) {
                     }
                 }
 
-                if (current->val_a.str_val) {
-                    free(current->val_a.str_val);
-                }
-
+                free(&current->val_a.str_val);
                 break;
                 
             }
