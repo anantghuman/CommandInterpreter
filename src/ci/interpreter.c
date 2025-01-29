@@ -162,9 +162,9 @@ void interpret(Interpreter *intr, Command *commands) {
                     return;
                 }
                 intr->variables[current->destination.num_val] = 0;
-                uint8_t temp = 0;
-                mem_load(&temp, start, num);
-                intr->variables[current->destination.num_val] = (uint64_t)temp;
+                int64_t value = 0;
+                mem_load((uint8_t*)&value, start, num);
+                intr->variables[current->destination.num_val] = value;
                 break;
             }
             default:
