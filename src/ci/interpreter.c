@@ -144,9 +144,11 @@ void interpret(Interpreter *intr, Command *commands) {
                     }
                 }
 
-                free(&current->val_a.str_val);
+                if (current->val_a.str_val != NULL) {
+                    free(current->val_a.str_val); 
+                    current->val_a.str_val = NULL; 
+                }
                 break;
-                
             }
             case CMD_LOAD: {
                 size_t start;
