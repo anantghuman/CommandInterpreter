@@ -325,16 +325,26 @@ static Command *parse_cmd(Parser *parser) {
     if (token.type == TOK_IDENT) {
         // TODO Week 4: Handle labels
         // be careful of edge cases!
+        char* l = malloc(parser->current.length + 1);
+        strncpy(l, token.lexeme, parser->current.length);
+        consume(parser, TOK_IDENT);
+        if (parser->current.type != TOK_COLON) {
+            parser->had_error = true;
+            return NULL;
+        }
+        consume(parser, TOK_COLON);
+        skip_nls(parser);
+        put_label(parser->label_map, l, parse_cmd(parser));
     }
 
-    if (token.type == TOK_EOF) {
+    if (parser->current.type == TOK_EOF) {
         // Week 4 TODO: If there is a label, put it there with a null command
 
         // No commands to parse; we are done
         return NULL;
     }
     Command* cmd;
-    switch (token.type) {
+    switch (parser->current.type) {
         // STUDENT TODO: Add cases handling different commands
         case TOK_MOV: {
             cmd = create_command(CMD_MOV);
@@ -705,6 +715,19 @@ static Command *parse_cmd(Parser *parser) {
                 return NULL;
             }
             return cmd;
+        case TOK_BRANCH:
+            cmd = create_command(CMD_BRANCH);
+            consume(parser, TOK_BRANCH);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
         default: 
             parser->had_error = true;
             break;
@@ -719,7 +742,7 @@ Command *parse_commands(Parser *parser) {
     // Change this!
     Command* head = parse_cmd(parser);
     Command* node = head;
-    while (!is_at_end(parser) && !parser->had_error) {
+    while (node != NULL && !is_at_end(parser) && !parser->had_error) {
          node->next = parse_cmd(parser);
          node = node->next;
     }

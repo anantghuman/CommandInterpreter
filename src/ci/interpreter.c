@@ -168,6 +168,10 @@ void interpret(Interpreter *intr, Command *commands) {
                 intr->variables[current->destination.num_val] = value;
                 break;
             }
+            case CMD_BRANCH: {
+                current->next = get_label(intr->label_map, current->val_a.str_val)->command;
+                break;
+            }
             default:
                 break;
         }
