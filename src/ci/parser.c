@@ -822,7 +822,12 @@ static Command *parse_cmd(Parser *parser) {
         case TOK_RET:
             cmd = create_command(CMD_RET);
             consume(parser, TOK_RET);
-            return cmd;
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
         case TOK_CALL:
             cmd = create_command(CMD_CALL);
             consume(parser, TOK_CALL);

@@ -62,6 +62,9 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_CMP: {
+                intr->is_equal = false;
+                intr->is_greater = false;
+                intr->is_less = false;
                 int64_t temp;
                 if (current->is_b_immediate) 
                     temp = current->val_b.num_val;
@@ -76,6 +79,9 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_CMP_U: {
+                intr->is_equal = false;
+                intr->is_greater = false;
+                intr->is_less = false;
                 uint64_t val_a = (uint64_t) intr->variables[current->val_a.num_val];
                 uint64_t val_b;
                 if (current->is_b_immediate) 
