@@ -169,7 +169,79 @@ void interpret(Interpreter *intr, Command *commands) {
                 break;
             }
             case CMD_BRANCH: {
-                current->next = get_label(intr->label_map, current->val_a.str_val)->command;
+                bool run = true;
+                switch (current->branch_condition) {
+                    case BRANCH_EQUAL:
+                        if (!intr->is_equal)
+                            run = false;
+                        break;
+                    case BRANCH_GREATER_EQUAL:
+                        if (!intr->is_equal && !intr->is_greater)
+                            run = false;
+                        break;
+                    case BRANCH_GREATER:
+                        if (!intr->is_greater)
+                            run = false;
+                        break;
+                    case BRANCH_LESS:
+                        if (!intr->is_less)
+                            run = false;
+                        break;
+                    case BRANCH_LESS_EQUAL:
+                        if (!intr->is_less && !intr->is_equal)
+                            run = false;
+                        break;
+                    case BRANCH_NOT_EQUAL:
+                        if (intr->is_equal)
+                            run = false;
+                        break;
+                    // case BRANCH_NONE:
+                    //     run = false;
+                    //     break;
+                    default:
+                        run = true;
+                        break;
+                }
+                if (run) {            
+                    Entry* e = get_label(intr->label_map, current->val_a.str_val);
+                    if (e == NULL) {
+                        printf("Label not found: %s\n", current->val_a.str_val);
+                        intr->had_error = true;
+                        return;
+                    }
+                    current->next = e->command;
+                }
+                break;
+            }
+            case CMD_RET: {
+                if (intr->the_stack == NULL) {
+                    current->next = NULL;
+                    return;
+                }
+                StackEntry* temp = intr->the_stack;
+                for (int i = 1; i < NUM_VARIABLES; i++) {
+                    intr->variables[i] = temp->variables[i];
+                }
+                current->next = temp->command;
+                intr->the_stack = temp->next;
+                free(temp);
+                break;  
+            }
+            case CMD_CALL: {
+                StackEntry* temp = malloc(sizeof(StackEntry));
+                temp->command = current->next;
+                for (int i = 0; i < NUM_VARIABLES; i++) {
+                    temp->variables[i] = intr->variables[i];
+                }
+                temp->next = intr->the_stack;
+                intr->the_stack = temp;
+                Entry* e = get_label(intr->label_map, current->val_a.str_val);
+                if (e == NULL) {
+                    printf("Label not found: %s\n", current->val_a.str_val);
+                    intr->had_error = true;
+                    return;
+                }
+                current->next = e->command;
                 break;
             }
             default:

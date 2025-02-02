@@ -1,8 +1,8 @@
-Hello, world!
-Error: 0
+Label not found: fail
+Error: 1
 Flags:
 Is greater: 0
-Is equal: 0
+Is equal: 1
 Is less: 0
 
 Variable values:
@@ -12,5 +12,4 @@ x16: 0, x17: 0, x18: 0, x19: 0, x20: 0, x21: 0, x22: 0, x23: 0,
 x24: 0, x25: 0, x26: 0, x27: 0, x28: 0, x29: 0, x30: 0, x31: 0
 
 Memory state:
-0x000-0x00f:
-    0x000: 48656c6c 6f2c2077 6f726c64 21000000 
+Unmodified

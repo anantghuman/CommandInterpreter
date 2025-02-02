@@ -327,14 +327,19 @@ static Command *parse_cmd(Parser *parser) {
         // be careful of edge cases!
         char* l = malloc(parser->current.length + 1);
         strncpy(l, token.lexeme, parser->current.length);
+        l[parser->current.length] = '\0';
         consume(parser, TOK_IDENT);
         if (parser->current.type != TOK_COLON) {
             parser->had_error = true;
             return NULL;
         }
         consume(parser, TOK_COLON);
+
         skip_nls(parser);
-        put_label(parser->label_map, l, parse_cmd(parser));
+        Command* head =  parse_cmd(parser);
+        skip_nls(parser);
+        put_label(parser->label_map, l, head);
+        return head;
     }
 
     if (parser->current.type == TOK_EOF) {
@@ -717,7 +722,110 @@ static Command *parse_cmd(Parser *parser) {
             return cmd;
         case TOK_BRANCH:
             cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_ALWAYS;
             consume(parser, TOK_BRANCH);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            parser->had_error = true;
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_BRANCH_GE:
+            cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_GREATER_EQUAL;
+            consume(parser, TOK_BRANCH_GE);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_BRANCH_EQ:
+            cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_EQUAL;
+            consume(parser, TOK_BRANCH_EQ);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_BRANCH_GT: 
+            cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_GREATER;
+            consume(parser, TOK_BRANCH_GT);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_BRANCH_LE:
+            cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_LESS_EQUAL;
+            consume(parser, TOK_BRANCH_LE);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_BRANCH_LT:
+            cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_LESS;
+            consume(parser, TOK_BRANCH_LT);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_BRANCH_NEQ:
+            cmd = create_command(CMD_BRANCH);
+            cmd->branch_condition = BRANCH_NOT_EQUAL;
+            consume(parser, TOK_BRANCH_NEQ);
+            cmd->val_a.str_val = malloc(parser->current.length + 1);
+            strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
+            cmd->val_a.str_val[parser->current.length] = '\0';
+            consume(parser, TOK_IDENT);
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                return cmd;
+            }
+            free(cmd);
+            return NULL;
+            break;
+        case TOK_RET:
+            cmd = create_command(CMD_RET);
+            consume(parser, TOK_RET);
+            return cmd;
+        case TOK_CALL:
+            cmd = create_command(CMD_CALL);
+            consume(parser, TOK_CALL);
             cmd->val_a.str_val = malloc(parser->current.length + 1);
             strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
             cmd->val_a.str_val[parser->current.length] = '\0';
