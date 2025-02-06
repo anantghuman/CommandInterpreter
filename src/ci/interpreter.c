@@ -37,7 +37,6 @@ void interpret(Interpreter *intr, Command *commands) {
 
     Command *current = commands;
     while (current && !intr->had_error) {
-        CommandType ct = NULL;
         switch (current->type) {
             // STUDENT TODO: process the commands and take actions as appropriate
             case CMD_MOV: {
@@ -217,7 +216,7 @@ void interpret(Interpreter *intr, Command *commands) {
                         return;
                     }
                     current = e->command;
-                    ct = CMD_BRANCH;
+                    continue;
                 } 
                 break;
             }
@@ -232,9 +231,9 @@ void interpret(Interpreter *intr, Command *commands) {
                     intr->variables[i] = temp->variables[i];
                 }
                 current = temp->command;
-                ct = CMD_RET;
                 intr->the_stack = temp->next;
                 free(temp);
+                continue;
                 break;  
             }
             case CMD_CALL: {
@@ -252,15 +251,14 @@ void interpret(Interpreter *intr, Command *commands) {
                     intr->had_error = true;
                     return;
                 }
-                ct = CMD_CALL;
                 current = e->command;
+                continue;
                 break;
             }
             default:
                 break;
         }
-        if (!(ct == CMD_RET || ct == CMD_CALL || ct == CMD_BRANCH))
-            current = current->next;
+        current = current->next;
     }
     free(intr->the_stack);
 }
