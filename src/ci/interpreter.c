@@ -37,6 +37,7 @@ void interpret(Interpreter *intr, Command *commands) {
 
     Command *current = commands;
     while (current && !intr->had_error) {
+        CommandType ct = BRANCH_NONE;
         switch (current->type) {
             // STUDENT TODO: process the commands and take actions as appropriate
             case CMD_MOV: {
@@ -201,9 +202,9 @@ void interpret(Interpreter *intr, Command *commands) {
                         if (intr->is_equal)
                             run = false;
                         break;
-                    // case BRANCH_NONE:
-                    //     run = false;
-                    //     break;
+                    case BRANCH_NONE:
+                        run = false;
+                        break;
                     default:
                         run = true;
                         break;
@@ -215,12 +216,14 @@ void interpret(Interpreter *intr, Command *commands) {
                         intr->had_error = true;
                         return;
                     }
-                    current->next = e->command;
-                }
+                    current = e->command;
+                    ct = CMD_BRANCH;
+                } 
                 break;
             }
             case CMD_RET: {
                 if (intr->the_stack == NULL) {
+                    free_command(current->next);
                     current->next = NULL;
                     return;
                 }
@@ -228,7 +231,8 @@ void interpret(Interpreter *intr, Command *commands) {
                 for (int i = 1; i < NUM_VARIABLES; i++) {
                     intr->variables[i] = temp->variables[i];
                 }
-                current->next = temp->command;
+                current = temp->command;
+                ct = CMD_RET;
                 intr->the_stack = temp->next;
                 free(temp);
                 break;  
@@ -236,26 +240,29 @@ void interpret(Interpreter *intr, Command *commands) {
             case CMD_CALL: {
                 StackEntry* temp = malloc(sizeof(StackEntry));
                 temp->command = current->next;
-                for (int i = 0; i < NUM_VARIABLES; i++) {
+                for (int i = 1; i < NUM_VARIABLES; i++) {
                     temp->variables[i] = intr->variables[i];
                 }
                 temp->next = intr->the_stack;
                 intr->the_stack = temp;
                 Entry* e = get_label(intr->label_map, current->val_a.str_val);
-                if (e == NULL) {
+                if (!e) {
                     printf("Label not found: %s\n", current->val_a.str_val);
+                    free(intr->the_stack);
                     intr->had_error = true;
                     return;
                 }
-                current->next = e->command;
+                ct = CMD_CALL;
+                current = e->command;
                 break;
             }
             default:
                 break;
         }
-        current = current->next;
+        if (!(ct == CMD_RET || ct == CMD_CALL || ct == CMD_BRANCH))
+            current = current->next;
     }
-    // Week 4: free the stack at the end
+    free(intr->the_stack);
 }
 
 void print_interpreter_state(Interpreter *intr) {

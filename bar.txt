@@ -1,8 +1,8 @@
-Label not found: fail
+Label not found: .2
 Error: 1
 Flags:
 Is greater: 0
-Is equal: 1
+Is equal: 0
 Is less: 0
 
 Variable values:

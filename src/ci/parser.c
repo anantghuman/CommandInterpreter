@@ -330,11 +330,11 @@ static Command *parse_cmd(Parser *parser) {
         l[parser->current.length] = '\0';
         consume(parser, TOK_IDENT);
         if (parser->current.type != TOK_COLON) {
+            free(l);
             parser->had_error = true;
             return NULL;
         }
         consume(parser, TOK_COLON);
-
         skip_nls(parser);
         Command* head =  parse_cmd(parser);
         skip_nls(parser);
@@ -729,9 +729,11 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                cmd->is_a_string = true;
                 return cmd;
             }
             parser->had_error = true;
+            free(cmd->val_a.str_val);
             free(cmd);
             return NULL;
             break;
@@ -744,8 +746,11 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                cmd->is_a_string = true;
                 return cmd;
             }
+            parser->had_error = true;
+            free(cmd->val_a.str_val);
             free(cmd);
             return NULL;
             break;
@@ -758,9 +763,10 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                cmd->is_a_string = true;
                 return cmd;
             }
-            free(cmd);
+            parser->had_error = true;
             return NULL;
             break;
         case TOK_BRANCH_GT: 
@@ -772,8 +778,11 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                cmd->is_a_string = true;
                 return cmd;
             }
+            parser->had_error = true;
+            free(cmd->val_a.str_val);
             free(cmd);
             return NULL;
             break;
@@ -786,8 +795,11 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                cmd->is_a_string = true;
                 return cmd;
             }
+            parser->had_error = true;
+            free(cmd->val_a.str_val);
             free(cmd);
             return NULL;
             break;
@@ -800,8 +812,11 @@ static Command *parse_cmd(Parser *parser) {
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+                cmd->is_a_string = true;
                 return cmd;
             }
+            parser->had_error = true;
+            free(cmd->val_a.str_val);
             free(cmd);
             return NULL;
             break;
@@ -809,14 +824,18 @@ static Command *parse_cmd(Parser *parser) {
             cmd = create_command(CMD_BRANCH);
             cmd->branch_condition = BRANCH_NOT_EQUAL;
             consume(parser, TOK_BRANCH_NEQ);
+            cmd->is_a_string = true;
             cmd->val_a.str_val = malloc(parser->current.length + 1);
             strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
             cmd->val_a.str_val[parser->current.length] = '\0';
+            cmd->is_a_string = true;
             consume(parser, TOK_IDENT);
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
-            free(cmd);
+            parser->had_error = true;
+            free(cmd->val_a.str_val);
+            free_command(cmd);
             return NULL;
             break;
         case TOK_RET:
@@ -825,20 +844,30 @@ static Command *parse_cmd(Parser *parser) {
             if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
                 return cmd;
             }
+            parser->had_error = true;
             free(cmd);
             return NULL;
             break;
         case TOK_CALL:
             cmd = create_command(CMD_CALL);
             consume(parser, TOK_CALL);
+            if (parser->current.type != TOK_IDENT) {
+                free(cmd->val_a.str_val);
+                free_command(cmd);
+                parser->had_error = true;
+                return NULL;
+            }
             cmd->val_a.str_val = malloc(parser->current.length + 1);
             strncpy(cmd->val_a.str_val, parser->current.lexeme, parser->current.length);
             cmd->val_a.str_val[parser->current.length] = '\0';
             consume(parser, TOK_IDENT);
-            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF) {
+            if (parser->current.type == TOK_NL || parser-> current.type == TOK_EOF ) {
+                cmd->is_a_string = true;
                 return cmd;
             }
-            free(cmd);
+            free(cmd->val_a.str_val);
+            free_command(cmd);
+            parser->had_error = true;
             return NULL;
             break;
         default: 

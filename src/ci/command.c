@@ -8,6 +8,10 @@ void free_command(Command *command) {
     if (command == NULL)
         return;
     Command* n = command->next;
+    if (command->is_a_string)
+        free(command->val_a.str_val);
+    if (command->is_b_string)
+        free(command->val_b.str_val);
     free(command);
     free_command(n);
 }
