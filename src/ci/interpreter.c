@@ -37,7 +37,7 @@ void interpret(Interpreter *intr, Command *commands) {
 
     Command *current = commands;
     while (current && !intr->had_error) {
-        CommandType ct = BRANCH_NONE;
+        CommandType ct = NULL;
         switch (current->type) {
             // STUDENT TODO: process the commands and take actions as appropriate
             case CMD_MOV: {
